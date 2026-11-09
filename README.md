@@ -10,6 +10,7 @@ update from a single place. They work in Claude Code, Codex, and Grok Build.
 | `grok-imagegen` | media | "bikin gambar", "generate image" | Generates and edits images with xAI Grok Imagine. Grok uses its own image tools; Claude Code and Codex hand the work to a Grok agent. |
 | `openrouter-imagegen` | media | "pakai GPT Image" | Generates images with GPT Image through the OpenRouter Images API. The fallback when Grok Imagine is unavailable. |
 | `whats-next` | engineering | `/whats-next` | Scouts a repo for the five most valuable things to do next, ranked and evidence-backed. |
+| `improve-loop` | workflow | "improve loop" | Improves code, a game, a manuscript, a research idea, or any document in rounds: a panel of models reviews, an independent gatekeeper keeps only changes that serve the charter, and the main agent applies them. Rounds, reviewers, and rotation are configurable. |
 
 My book-writing suite lives in its own repo:
 [nam-book-studio](https://github.com/arthamegayasa/nam-book-studio).
