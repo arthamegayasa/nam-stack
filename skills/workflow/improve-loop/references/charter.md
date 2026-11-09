@@ -15,16 +15,18 @@ The charter is the fixed reference every gate decision cites. Fill every field, 
 - Invariants: <what no round may change: profile defaults plus the user's>
 - Rubric (3-6 criteria, scored 0-10):
   | Criterion | What a 10 looks like | Evidence used |
-- Panel: <model:role, ...>. Anchor: <model>. Gatekeeper: <model>. Strategy: <hybrid | rotate | panel>, per-round <k>.
+- Panel: <short name = exact model id (role), ...>. Anchor: <model id>. Gatekeeper: <model id or "fresh subagent on <provider>">. Strategy: <hybrid | rotate | panel>, per-round <k>.
 - Reviewer schedule: (table, see below)
-- Budgets: rounds <N> (<ceiling | full>); at most 5 ACCEPTs per round; change per round at most <profile default or user's>.
-- Required checks: <commands or checks that pass every round>
+- Budgets: rounds <N> (<ceiling | full>); at most 5 ACCEPTs per round; change per round at most <profile default or user's>, measured as <how>.
+- Required checks: <command>: <result on the baseline>. Failing at baseline: <checks, required only when a goal is to fix them | none>
 - Mode: <auto | checkpoint>
 ```
 
+Measure change the same way every round. For lines, the default is to stage the round (`git add -A`, so new files count) and add insertions and deletions from `git diff --cached --shortstat <last version>`, test files included unless the charter excludes them.
+
 ## Reviewer schedule
 
-- `hybrid`: round 1 is every reviewer. From round 2, each round takes the next `per-round` reviewers in list order, starting at the first reviewer and wrapping.
+- `hybrid`: round 1 is every reviewer. From round 2, each round takes the next `per-round` reviewers in list order, starting at the first reviewer and wrapping, with no reviewer twice in one round: a `per-round` of the panel size or more means the full panel.
 - `rotate`: the same rotation, starting in round 1.
 - `panel`: every reviewer, every round.
 - The anchor scores every round. It needs a separate score-only call only in rounds where it is not reviewing.
@@ -59,8 +61,8 @@ Same panel, `per-round 1`, anchor `opus`:
   | Clarity | One read gives objective, design, main result | sentence-level read |
   | Journal fit | Headings and word limit match the guideline | guideline + word count |
   | Claim accuracy | Every claim matches results.csv, no overstatement | claim-to-source map |
-- Panel: opus:journal-editor, sol:methodologist. Anchor: opus. Gatekeeper: fresh Claude subagent. Strategy: hybrid, per-round 1.
-- Budgets: rounds 3 (ceiling); at most 5 ACCEPTs per round; at most 15% of words changed per round.
-- Required checks: word count ≤ 250; every number appears in results.csv.
+- Panel: opus = claude-opus-5-5 (journal-editor), sol = gpt-6.1-sol (methodologist). Anchor: claude-opus-5-5. Gatekeeper: fresh subagent on Claude. Strategy: hybrid, per-round 1.
+- Budgets: rounds 3 (ceiling); at most 5 ACCEPTs per round; at most 15% of words changed per round, measured by a word diff against the last version.
+- Required checks: word count ≤ 250: 238 on the baseline; every number appears in results.csv: pass. Failing at baseline: none.
 - Mode: auto
 ```

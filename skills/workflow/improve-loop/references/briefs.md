@@ -1,6 +1,6 @@
 # Briefs
 
-Every reviewer and the gatekeeper starts with no history: send the whole brief each time, filling every `<...>`. Rename reviewer proposal ids to `R<round>-<reviewer>-P<n>` in the ledger.
+Every reviewer and the gatekeeper starts with no history: send the whole brief each time, filling every `<...>`, and save it in the round's evidence folder so a restarted call sends the same text. Rename reviewer proposal ids to `R<round>-<reviewer>-P<n>` in the ledger.
 
 ## Reviewer
 
@@ -37,17 +37,22 @@ PARK
 
 ## Score-only (anchor rounds without a review, and the final pass)
 
+The anchor's scores must compare like with like, so this brief carries the same charter and the same scoring line as the reviewer brief.
+
 ```text
 Score only. Do not edit files, propose changes, or start subagents. Reply in English.
 
-CHARTER RUBRIC
-<rubric table>
+CHARTER
+<charter text>
 
 TARGET (current state)
 <location>
 
 EVIDENCE
 <evidence pack>
+
+TASK
+Score each rubric criterion 0-10 against the charter's "what a 10 looks like", with one line of reasoning each.
 
 REPLY EXACTLY
 SCORES
@@ -108,7 +113,11 @@ CUMULATIVE CHANGE SINCE BASELINE
 <summary or diff stat>
 
 CHECK RESULTS
-<required checks and outcomes>
+<required checks and outcomes; checks failing at baseline marked as such>
+Change size: <measured> of <budget>, measured as <the charter's measure>
+
+EARLIER VERDICT THIS ROUND
+<none | the ROUND FAIL line, and what was repaired or reverted since>
 
 CONFIRM
 - Every change traces to an accepted id; nothing extra slipped in.
