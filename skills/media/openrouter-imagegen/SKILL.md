@@ -1,21 +1,23 @@
 ---
 name: openrouter-imagegen
-description: Generate or edit images with OpenAI's newest GPT Image model via the OpenRouter Images API. Use whenever the user asks to generate, create, draw, render, mock up, or edit an image, illustration, poster mockup, thumbnail, icon, diagram concept, or reference picture, or says "gambar", "generate image", "bikin gambar", "imagegen", "nano banana", or "image generation". This is the only image generation path for Claude Code on this machine (Gemini/nanobanana was removed).
+description: Generate or edit images with OpenAI's newest GPT Image model via the OpenRouter Images API. Use when the user asks for OpenRouter or GPT Image by name, or approves it as the fallback when Grok Imagine (grok-imagegen) is unavailable.
 ---
 
 # OpenRouter ImageGen
 
 ## Purpose
 
-Single entry point for image generation in Claude Code. All image generation goes
-through OpenRouter's dedicated Images API and targets OpenAI's newest GPT Image
-model. Do not use Gemini, nanobanana, or any other provider for images.
+The fallback image route. `grok-imagegen` is the default; this skill sends
+image generation through OpenRouter's dedicated Images API to OpenAI's newest
+GPT Image model.
 
 - Endpoint: `POST https://openrouter.ai/api/v1/images`
 - Default model: `openai/gpt-image-2.5-sunburst` (precision tier)
 - Speed tier: `openai/gpt-image-2.5-flare`
 - Fallbacks (automatic): `openai/gpt-image-2`, then `openai/gpt-image-1`
-- Script: `~/.claude/skills/openrouter-imagegen/scripts/openrouter_image.py`
+- Script: `scripts/openrouter_image.py` inside this skill's folder. With Skills
+  Manager the skill stays undeployed, so the folder is
+  `~/.skills-manager/skills/openrouter-imagegen`.
 
 The script resolves `--model auto` to the newest `openai/gpt-image-*` model that
 OpenRouter lists, so use `auto` when the user asks for "the latest" model.
@@ -39,14 +41,14 @@ Python 3.10+ is required. No third-party packages are needed (stdlib only).
 From Git Bash or the Bash tool:
 
 ```bash
-python ~/.claude/skills/openrouter-imagegen/scripts/openrouter_image.py \
+python ~/.skills-manager/skills/openrouter-imagegen/scripts/openrouter_image.py \
   --prompt "..." --aspect-ratio 2:3 --quality high --out ./generated_images
 ```
 
 From PowerShell:
 
 ```powershell
-python "$env:USERPROFILE\.claude\skills\openrouter-imagegen\scripts\openrouter_image.py" --prompt "..." --out .\generated_images
+python "$env:USERPROFILE\.skills-manager\skills\openrouter-imagegen\scripts\openrouter_image.py" --prompt "..." --out .\generated_images
 ```
 
 Key flags:
@@ -72,7 +74,7 @@ result to the user with the Read tool or SendUserFile so they can see it.
 
 - Write the prompt as a structured spec: subject, composition, style, palette, typography, text that must appear (quoted exactly), and an explicit avoid list.
 - Long prompts belong in a file passed with `--prompt-file`, not on the command line.
-- For posters and layouts, use the `paper-poster-imagegen` skill, which owns the poster prompt template and calls this script.
+- For posters and layouts, `paper-poster-imagegen` owns the prompt template; its generation step goes to `grok-imagegen` unless the user picked OpenRouter.
 - For edits, pass the existing image with `--ref` and describe only the change.
 - Pick aspect ratio from the deliverable: `2:3` for A0/A1 portrait posters, `3:2` for landscape posters, `16:9` for slides and thumbnails, `1:1` for icons and avatars.
 - Use `--quality high` by default. Use `xhigh` or `max` only when the user asks for maximum fidelity, since cost rises with output tokens.
