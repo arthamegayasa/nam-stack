@@ -8,4 +8,4 @@ For games, web apps, and anything a person plays or clicks.
 - **Invariants by default**: the core loop, controls, and save compatibility, unless the charter frees them.
 - **Helpers**: `grok-imagegen` for new or revised art; `tdd` for logic changes.
 - **Versioning**: branch `improve-loop/<slug>`, one commit per round, with before and after screenshots in the ledger.
-- **Change budget default**: at most 300 changed lines or 5 replaced assets per round.
+- **Change budget default**: at most 300 changed lines and at most 5 replaced assets per round.

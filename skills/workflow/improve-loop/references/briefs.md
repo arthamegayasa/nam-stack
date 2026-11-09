@@ -37,8 +37,6 @@ PARK
 
 ## Score-only (anchor rounds without a review, and the final pass)
 
-The anchor's scores must compare like with like, so this brief carries the same charter and the same scoring line as the reviewer brief.
-
 ```text
 Score only. Do not edit files, propose changes, or start subagents. Reply in English.
 
@@ -127,5 +125,5 @@ CONFIRM
 
 REPLY EXACTLY ONE OF
 ROUND PASS
-ROUND FAIL | <change>: <reason> | revert: <that change | whole round>
+ROUND FAIL | <change>: <reason>; <next failing change>: <reason> | revert: <those changes | whole round>
 ```
