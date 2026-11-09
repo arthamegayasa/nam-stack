@@ -90,7 +90,7 @@ Implement only ACCEPTed proposals, highest value first, each with the smallest c
 
 Run the required checks. When a check fails and the change that broke it cannot be fixed inside its own acceptance check, revert that change and mark it `reverted`. Then send the gatekeeper the round-gate brief: the round's changes, the ACCEPT list, the charter, the measured change size, and the cumulative change since baseline. It confirms that every change traces to an ACCEPTed proposal, invariants hold, the round stayed inside its change budget, and the target still points where the charter does.
 
-On ROUND FAIL, check the alarms first. Otherwise make one repair pass: repair each named change so it meets its acceptance check inside the budget (a proposal dropped to fit the budget is `carried` whole), or revert it, or revert the whole round when the verdict says so; then rerun the checks and the round gate. A second FAIL in the same round reverts the whole round. A round with any FAIL counts as a failed round gate. Reverts happen in the working tree before the commit; history is never rewritten.
+On ROUND FAIL, check the alarms first. Otherwise make one repair pass: repair each named change so it meets its acceptance check inside the budget (a proposal dropped to fit the budget is `carried` whole) or revert it, and revert the whole round when the verdict's scope is `whole round`; then rerun the checks and the round gate. A second FAIL in the same round reverts the whole round. A round with any FAIL counts as a failed round gate. Reverts happen in the working tree before the commit; history is never rewritten.
 
 ### 6. Version
 

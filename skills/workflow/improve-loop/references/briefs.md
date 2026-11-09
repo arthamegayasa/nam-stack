@@ -125,5 +125,5 @@ CONFIRM
 
 REPLY EXACTLY ONE OF
 ROUND PASS
-ROUND FAIL | <change>: <reason>; <next failing change>: <reason> | revert: <those changes | whole round>
+ROUND FAIL | <change>: <reason>; <next failing change>: <reason> | scope: <those changes | whole round>
 ```
