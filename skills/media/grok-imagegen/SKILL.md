@@ -64,6 +64,6 @@ View every output file before using it. Done when each requested file exists at 
 
 ## Fallback
 
-When Grok is unavailable (no provider, auth error, Imagine quota), report it and ask before switching routes. When the user asks for OpenRouter or GPT Image, or approves the fallback, follow `C:/Users/Nyoman/.skills-manager/skills/openrouter-imagegen/SKILL.md` and run its script from that library path; that skill stays undeployed.
+When Grok is unavailable (no provider, auth error, Imagine quota), report it and ask before switching routes. When the user asks for OpenRouter or GPT Image, or approves the fallback, follow the `openrouter-imagegen` skill at `~/.skills-manager/skills/openrouter-imagegen/SKILL.md` and run its script from that library folder; that skill stays undeployed.
 
 `paper-poster-imagegen` still owns poster prompts; send its generation step here. If Grok garbles dense poster text, show the user and offer OpenRouter.
