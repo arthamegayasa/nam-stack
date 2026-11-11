@@ -62,8 +62,16 @@ The JSON `text` field holds the worker's report. Headless Grok carries `image_ge
 
 View every output file before using it. Done when each requested file exists at its destination and matches its spec. On a mismatch, send a corrective brief that passes the failed file to `image_edit` with the specific change. Tell the user the file paths, that Grok Imagine made them, and the call count.
 
-## Fallback
+## Other routes
 
-When Grok is unavailable (no provider, auth error, Imagine quota), report it and ask before switching routes. When the user asks for OpenRouter or GPT Image, or approves the fallback, follow the `openrouter-imagegen` skill at `~/.skills-manager/skills/openrouter-imagegen/SKILL.md` and run its script from that library folder; that skill stays undeployed.
+Two undeployed skills reach OpenAI's GPT Image models. Read the chosen one's `SKILL.md` in its library folder and run its script from there:
 
-`paper-poster-imagegen` still owns poster prompts; send its generation step here. If Grok garbles dense poster text, show the user and offer OpenRouter.
+| The user says | Skill |
+|---|---|
+| OpenAI API directly, their OpenAI key, "pakai OpenAI langsung" | `openai-imagegen` at `~/.skills-manager/skills/openai-imagegen/` (GPT Image 2.6 Flare, OpenAI billing) |
+| OpenRouter | `openrouter-imagegen` at `~/.skills-manager/skills/openrouter-imagegen/` (OpenRouter credits) |
+| GPT Image, with neither provider named | ask once which bill it goes on, OpenAI or OpenRouter |
+
+When Grok is unavailable (no provider, auth error, Imagine quota), report it and offer both routes; switch only after the user picks one.
+
+`paper-poster-imagegen` still owns poster prompts; send its generation step here. If Grok garbles dense poster text, show the user and offer the GPT Image routes.

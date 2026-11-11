@@ -1,15 +1,16 @@
 ---
 name: openrouter-imagegen
-description: Generate or edit images with OpenAI's newest GPT Image model via the OpenRouter Images API. Use when the user asks for OpenRouter or GPT Image by name, or approves it as the fallback when Grok Imagine (grok-imagegen) is unavailable.
+description: Generate or edit images with OpenAI's newest GPT Image model via the OpenRouter Images API, billed to OpenRouter credits. Use when the user asks for OpenRouter by name, or picks it as the fallback when Grok Imagine (grok-imagegen) is unavailable.
 ---
 
 # OpenRouter ImageGen
 
 ## Purpose
 
-The fallback image route. `grok-imagegen` is the default; this skill sends
+A fallback image route. `grok-imagegen` is the default; this skill sends
 image generation through OpenRouter's dedicated Images API to OpenAI's newest
-GPT Image model.
+GPT Image model. When the user wants OpenAI's own API and key instead, use
+`openai-imagegen`.
 
 - Endpoint: `POST https://openrouter.ai/api/v1/images`
 - Default model: `openai/gpt-image-2.5-sunburst` (precision tier)

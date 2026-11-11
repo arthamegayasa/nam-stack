@@ -8,7 +8,8 @@ update from a single place. They work in Claude Code, Codex, and Grok Build.
 | Skill | Category | Say | What it does |
 |---|---|---|---|
 | `grok-imagegen` | media | "bikin gambar", "generate image" | Generates and edits images with xAI Grok Imagine. Grok uses its own image tools; Claude Code and Codex hand the work to a Grok agent. |
-| `openrouter-imagegen` | media | "pakai GPT Image" | Generates images with GPT Image through the OpenRouter Images API. The fallback when Grok Imagine is unavailable. |
+| `openrouter-imagegen` | media | "pakai OpenRouter" | Generates images with GPT Image through the OpenRouter Images API, billed to OpenRouter credits. A fallback when Grok Imagine is unavailable. |
+| `openai-imagegen` | media | "pakai OpenAI langsung" | Generates and edits images with GPT Image 2.6 Flare through OpenAI's own Image API and `OPENAI_API_KEY`. A fallback when Grok Imagine is unavailable. |
 | `whats-next` | engineering | `/whats-next` | Scouts a repo for the five most valuable things to do next, ranked and evidence-backed. |
 | `improve-loop` | workflow | "improve loop" | Improves code, a game, a manuscript, a research idea, or any document in rounds: a panel of models reviews, an independent gatekeeper keeps only changes that serve the charter, and the main agent applies them. Rounds, reviewers, and rotation are configurable. |
 
@@ -51,6 +52,8 @@ skills-manager-cli skills update <skill>   # or: --all
   and Codex reach Grok through [T3 Code](https://github.com/pingdotgg/t3code)'s
   `delegate_task`, or through `grok -p` without it.
 - `openrouter-imagegen`: Python 3.10+ and an `OPENROUTER_API_KEY`.
+- `openai-imagegen`: Python 3.10+ and an `OPENAI_API_KEY`; GPT Image models may
+  require API Organization Verification on the OpenAI platform.
 
 ## License
 
