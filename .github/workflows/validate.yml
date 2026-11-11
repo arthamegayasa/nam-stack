@@ -17,4 +17,5 @@ jobs:
       - uses: actions/checkout@v4
       - run: python3 scripts/validate.py --self-test
       - run: python3 scripts/validate.py
-      - run: python3 evals/openai-imagegen/test_openai_image.py
+      - name: eval tests
+        run: for test in evals/*/test_*.py; do python3 "$test"; done

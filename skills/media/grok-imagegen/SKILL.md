@@ -1,6 +1,6 @@
 ---
 name: grok-imagegen
-description: Generate or edit images with xAI Grok Imagine, the default image route on this machine. Use whenever the user asks to generate, draw, render, or mock up a new image, or to edit, restyle, or derive variants from an existing one (illustration, sprite, icon, thumbnail, poster mockup, reference picture), or says "gambar", "bikin gambar", "generate image", or "imagegen".
+description: Generate or edit images with xAI Grok Imagine, the default image route on this machine. Use whenever the user asks to generate, draw, render, or mock up a new image, or to edit, restyle, or derive variants from an existing one (illustration, sprite, icon, thumbnail, poster mockup, reference picture), or says "gambar", "bikin gambar", "generate image", or "imagegen". Also routes image requests that name OpenAI, OpenRouter, or GPT Image.
 ---
 
 # Grok Imagegen

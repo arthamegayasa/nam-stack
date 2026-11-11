@@ -171,17 +171,41 @@ class LiveCallTest(unittest.TestCase):
         self.assertIn(PNG_BYTES, request['raw'])
         self.assertIn(b'name="prompt"\r\n\r\na red fox', request['raw'])
 
-    def test_unavailable_model_falls_back_to_the_next_one(self):
-        fake = FakeOpenAI({'gpt-image-2.6-flare': 404})
+    def test_unavailable_model_falls_back_to_2_5_flare_without_2_6_only_fields(self):
+        for status in (404, 500, 503):
+            with self.subTest(status=status):
+                fake = FakeOpenAI({'gpt-image-2.6-flare': status})
+                try:
+                    result = self.call(fake, '--complexity', 'low')
+                finally:
+                    fake.close()
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads(result.stdout)['model'], 'gpt-image-2.5-flare')
+                self.assertIn(b'"complexity"', fake.requests[0]['raw'])
+                self.assertNotIn(b'"complexity"', fake.requests[1]['raw'])
+
+    def test_mask_is_uploaded_next_to_the_reference(self):
+        ref = pathlib.Path(self.tmp.name, 'ref.png')
+        mask = pathlib.Path(self.tmp.name, 'mask.png')
+        ref.write_bytes(PNG_BYTES)
+        mask.write_bytes(PNG_BYTES)
+        fake = FakeOpenAI()
         try:
-            result = self.call(fake)
+            result = self.call(fake, '--ref', str(ref), '--mask', str(mask))
         finally:
             fake.close()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(json.loads(result.stdout)['model'], 'gpt-image-2.5-flare')
+        self.assertIn(b'name="mask"; filename="mask.png"', fake.requests[0]['raw'])
+
+    def test_unreachable_server_reports_cleanly(self):
+        result = run('--prompt', 'x', '--out', str(self.out),
+                     env={'OPENAI_API_KEY': 'sk-test', 'OPENAI_BASE_URL': 'http://127.0.0.1:9/v1'})
+        self.assertEqual(result.returncode, 1)
+        self.assertIn('could not reach', result.stderr)
+        self.assertNotIn('Traceback', result.stderr)
 
     def test_request_errors_stop_without_fallback(self):
-        for status in (400, 401):
+        for status in (400, 401, 403, 429):
             with self.subTest(status=status):
                 fake = FakeOpenAI({'gpt-image-2.6-flare': status})
                 try:

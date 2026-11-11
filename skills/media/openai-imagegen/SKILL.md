@@ -8,7 +8,7 @@ description: Generate or edit images with GPT Image 2.6 Flare through OpenAI's o
 One of two fallback routes behind `grok-imagegen`. This one calls OpenAI directly, so usage lands on the user's OpenAI bill; `openrouter-imagegen` reaches the same model family through OpenRouter credits.
 
 - Default model: `gpt-image-2.6-flare` (speed tier). Use `gpt-image-2.6-sunburst` when the user wants maximum detail, layout, or edit accuracy.
-- Automatic fallback on 404, 429, or 5xx: `gpt-image-2.5-flare`, then `gpt-image-2`. Every other error stops the run.
+- Automatic fallback when the model is unavailable (404) or OpenAI has a server fault (5xx): one retry on `gpt-image-2.5-flare`, without `complexity`. Every other error stops the run; report which model succeeded.
 - Script: `scripts/openai_image.py`, Python 3.10+, stdlib only. With Skills Manager the skill stays undeployed, so the folder is `~/.skills-manager/skills/openai-imagegen`.
 
 ## Key
@@ -28,7 +28,7 @@ python "$env:USERPROFILE\.skills-manager\skills\openai-imagegen\scripts\openai_i
 | `--prompt` / `--prompt-file` | prompt text, or a UTF-8 file for long structured prompts |
 | `--model` | default `gpt-image-2.6-flare`; `--no-fallback` pins it |
 | `--aspect-ratio` | `1:1`, `3:2`, `2:3`, `4:3`, `3:4`, `16:9`, `9:16`, `21:9`, `auto`; mapped to a size |
-| `--size` | explicit `WIDTHxHEIGHT` (multiples of 16, edge up to 3840, 4K max); overrides the ratio |
+| `--size` | explicit `WIDTHxHEIGHT` (multiples of 16, longest edge 3840, ratio within 1:3 to 3:1); overrides the ratio |
 | `--quality` | `low`, `medium`, `high` (default), `xhigh`, `max`, `auto` |
 | `--complexity` | `low`, `medium`, `high`; the API default is `high`, lower renders simpler scenes |
 | `--background` | `auto`, `transparent` (png/webp only), `opaque` |
@@ -57,7 +57,7 @@ GPT Image 2.6 bills per token: text input $5, image input $8, image output $30 p
 ## Failures
 
 - 401: invalid key. 403: often the organization still needs API Organization Verification at platform.openai.com. Report either and stop.
-- 429 `insufficient_quota`: the OpenAI account needs billing credit; the fallback models share that quota, so report it.
+- 429: `insufficient_quota` means the OpenAI account needs billing credit; otherwise it is a rate limit, so wait and retry once.
 - 400: a parameter the model rejects; fix the request instead of retrying.
 - Moderation refusal: rephrase the prompt; leave the filter alone.
 

@@ -38,9 +38,9 @@ DEFAULT_BASE_URL = "https://api.openai.com/v1"
 
 # GPT Image 2.6 launched 2026-11-04. Flare is the speed tier, Sunburst the precision tier.
 DEFAULT_MODEL = "gpt-image-2.6-flare"
-FALLBACK_MODELS = ["gpt-image-2.5-flare", "gpt-image-2"]
-# Only these statuses mean "try another model": unknown model, rate limit, server trouble.
-FALLBACK_STATUSES = {404, 429, 500, 502, 503, 504}
+# 2.5 Flare takes the same quality levels; `complexity` is sent to 2.6 models only.
+FALLBACK_MODEL = "gpt-image-2.5-flare"
+TWO_SIX_ONLY_FIELDS = ("complexity",)
 
 # Aspect ratio -> size. Every size keeps both edges a multiple of 16.
 ASPECT_SIZES = {
@@ -72,6 +72,12 @@ class ApiError(RuntimeError):
         super().__init__(f"HTTP {status}: {message}")
         self.status = status
 
+    @property
+    def model_unavailable(self) -> bool:
+        """404 (model unknown to this key) or a server fault: another model may still answer.
+        429 stays out: quota and rate limits are shared across models."""
+        return self.status == 404 or self.status >= 500
+
 
 def eprint(*args: object) -> None:
     print(*args, file=sys.stderr)
@@ -96,6 +102,7 @@ def load_api_key(explicit_file: str | None) -> str:
             return lines[0].strip()
     # A key saved with `setx` is invisible to processes started before it was set
     # (an already-running Claude Code app), so read it from the registry.
+    # OPENAI_API_KEY_SKIP_REGISTRY lets the eval tests prove the missing-key message.
     if sys.platform == "win32" and not os.environ.get("OPENAI_API_KEY_SKIP_REGISTRY"):
         import winreg
 
@@ -187,7 +194,8 @@ def http(method: str, path: str, api_key: str, body: bytes | None = None,
     headers = {"Authorization": f"Bearer {api_key}"}
     if body is not None:
         headers["Content-Type"] = content_type
-    req = urllib.request.Request(base_url() + path, data=body, headers=headers, method=method)
+    url = base_url() + path
+    req = urllib.request.Request(url, data=body, headers=headers, method=method)
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return json.loads(resp.read().decode("utf-8"))
@@ -198,6 +206,11 @@ def http(method: str, path: str, api_key: str, body: bytes | None = None,
         except ValueError:
             message = text
         raise ApiError(exc.code, message) from None
+    except (urllib.error.URLError, TimeoutError, ConnectionError) as exc:
+        reason = getattr(exc, "reason", exc)
+        raise RuntimeError(f"could not reach {url}: {reason}") from None
+    except ValueError as exc:
+        raise RuntimeError(f"response from {url} was not JSON: {exc}") from None
 
 
 def call_api(args: argparse.Namespace, fields: dict, api_key: str) -> dict:
@@ -324,21 +337,29 @@ def main() -> int:
     api_key = load_api_key(args.api_key_file)
     out_dir = pathlib.Path(args.out)
     stem = args.name or f"image_{time.strftime('%Y%m%d_%H%M%S')}"
-    candidates = [args.model] + ([] if args.no_fallback else [m for m in FALLBACK_MODELS if m != args.model])
+    candidates = [args.model]
+    if not args.no_fallback and args.model != FALLBACK_MODEL:
+        candidates.append(FALLBACK_MODEL)
 
     for model in candidates:
         fields["model"] = model
+        if not model.startswith("gpt-image-2.6"):
+            for key in TWO_SIX_ONLY_FIELDS:
+                fields.pop(key, None)
         eprint(f"generating with {model} ...")
         started = time.time()
         try:
             result = call_api(args, fields, api_key)
+            saved = save_images(result, out_dir, stem, args.output_format)
         except ApiError as exc:
             eprint(f"  failed: {exc}")
-            if exc.status in FALLBACK_STATUSES and model != candidates[-1]:
+            if exc.model_unavailable and model != candidates[-1]:
                 continue
             eprint("ERROR: image request failed.")
             return 1
-        saved = save_images(result, out_dir, stem, args.output_format)
+        except (RuntimeError, OSError, ValueError) as exc:
+            eprint(f"ERROR: {exc}")
+            return 1
         usage = result.get("usage") or {}
         summary = {
             "model": model,
